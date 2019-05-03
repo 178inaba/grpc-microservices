@@ -9,6 +9,7 @@ import (
 	pb "github.com/178inaba/grpc-microservices/proto/task"
 	"github.com/178inaba/grpc-microservices/shared/metadata"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -72,4 +73,18 @@ func (s *TaskService) CreateTask(ctx context.Context, req *pb.CreateTaskRequest)
 	}
 
 	return &pb.CreateTaskResponse{Task: task}, nil
+}
+
+func (s *TaskService) FindTasks(ctx context.Context, _ *empty.Empty) (*pb.FindTasksResponse, error) {
+	userID, err := metadata.GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, fmt.Sprintf("get user id from context: %v", err))
+	}
+
+	tasks, err := s.store.FindTasks(userID)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("find tasks: %v", err))
+	}
+
+	return &pb.FindTasksResponse{Tasks: tasks}, nil
 }
