@@ -58,12 +58,12 @@ func main() {
 	go func() {
 		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err != nil {
-			logger.Fatal("TODO")
+			logger.Fatal("Failed to create listener.", zap.Error(err))
 		}
 
-		logger.Info("TODO")
+		logger.Info("Start server.", zap.Int("port", port))
 		if err := srv.Serve(lis); err != nil {
-			logger.Info("TODO")
+			logger.Info("Exit server.", zap.Error(err))
 		}
 	}()
 
