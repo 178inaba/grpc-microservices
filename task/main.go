@@ -18,6 +18,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+const port = 50051
+
 func main() {
 	logger, err := zap.NewDevelopment()
 	defer logger.Sync()
@@ -54,7 +56,7 @@ func main() {
 
 	// Waiting for gRPC connection.
 	go func() {
-		lis, err := net.Listen("tcp", port)
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err != nil {
 			logger.Fatal("TODO")
 		}
