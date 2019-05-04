@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/golang/protobuf v1.3.1
+	github.com/gorilla/mux v1.7.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.8.1
