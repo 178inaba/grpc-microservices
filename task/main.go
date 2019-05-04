@@ -27,13 +27,15 @@ func main() {
 		panic(fmt.Sprintf("zap new: %v.", err))
 	}
 
+	ctx := context.Background()
+
 	// Client stub generation.
-	activityConn, err := grpc.Dial(os.Getenv("ACTIVITY_SERVICE_ADDR"), grpc.WithInsecure())
+	activityConn, err := grpc.DialContext(ctx, os.Getenv("ACTIVITY_SERVICE_ADDR"), grpc.WithInsecure())
 	if err != nil {
 		logger.Fatal("Failed to dial activity", zap.Error(err))
 	}
 
-	projectConn, err := grpc.Dial(os.Getenv("PROJECT_SERVICE_ADDR"), grpc.WithInsecure())
+	projectConn, err := grpc.DialContext(ctx, os.Getenv("PROJECT_SERVICE_ADDR"), grpc.WithInsecure())
 	if err != nil {
 		logger.Fatal("Failed to dial project", zap.Error(err))
 	}
@@ -68,22 +70,23 @@ func main() {
 	}()
 
 	// Graceful stop
-	sigint := make(chan os.Signal, 1)
-	signal.Notify(sigint, syscall.SIGTERM)
-	<-sigint
-	logger.Info("TODO")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGQUIT)
+	<-quit
+
+	logger.Info("Received a signal of graceful shutdown.")
+
 	stopped := make(chan struct{})
 	go func() {
 		srv.GracefulStop()
 		close(stopped)
 	}()
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+
 	select {
-	case <-ctx.Done():
+	case <-time.After(time.Minute):
 		srv.Stop()
 	case <-stopped:
-		cancel()
 	}
 
-	logger.Info("TODO")
+	logger.Info("Completed graceful shutdown.")
 }
