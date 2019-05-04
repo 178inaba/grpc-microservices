@@ -88,3 +88,68 @@ func (s *TaskService) FindTasks(ctx context.Context, _ *empty.Empty) (*pb.FindTa
 
 	return &pb.FindTasksResponse{Tasks: tasks}, nil
 }
+
+func (s *TaskService) FindProjectTasks(ctx context.Context, req *pb.FindProjectTasksRequest) (*pb.FindProjectTasksResponse, error) {
+	userID, err := metadata.GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, fmt.Sprintf("get user id from context: %v", err))
+	}
+
+	tasks, err := s.store.FindProjectTasks(req.GetProjectId(), userID)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("find project tasks: %v", err))
+	}
+
+	return &pb.FindProjectTasksResponse{Tasks: tasks}, nil
+}
+
+func (s *TaskService) UpdateTask(ctx context.Context, req *pb.UpdateTaskRequest) (*pb.UpdateTaskResponse, error) {
+	if req.GetName() == "" {
+		return nil, status.Error(codes.InvalidArgument, "empty task name")
+	} else if req.GetStatus() == pb.Status_UNKNOWN {
+		return nil, status.Error(codes.InvalidArgument, "unknown task status")
+	}
+
+	userID, err := metadata.GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, fmt.Sprintf("get user id from context: %v", err))
+	}
+
+	task, err := s.store.FindTask(req.GetTaskId(), userID)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, fmt.Sprintf("find task: %v", err))
+	}
+
+	updatedTask, err := s.store.UpdateTask(&pb.Task{
+		Id:        task.GetId(),
+		Name:      req.GetName(),
+		Status:    req.GetStatus(),
+		ProjectId: task.GetProjectId(),
+		UserId:    task.GetUserId(),
+		CreatedAt: task.GetCreatedAt(),
+		UpdatedAt: ptypes.TimestampNow(),
+	})
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("update task: %v", err))
+	}
+
+	if task.GetStatus() == updatedTask.GetStatus() {
+		return &pb.UpdateTaskResponse{Task: updatedTask}, nil
+	}
+
+	any, err := ptypes.MarshalAny(&pbactivity.UpdateTaskStatusContent{
+		TaskId:     updatedTask.GetId(),
+		TaskName:   updatedTask.GetName(),
+		TaskStatus: updatedTask.GetStatus(),
+	})
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("marshal any: %v", err))
+	}
+
+	if _, err := s.activityClient.CreateActivity(
+		ctx, &pbactivity.CreateActivityRequest{Content: any}); err != nil {
+		return nil, err
+	}
+
+	return &pb.UpdateTaskResponse{Task: updatedTask}, nil
+}
