@@ -94,8 +94,7 @@ func (s *FrontServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 	projectIDStr := r.Form.Get("project_id")
 	projectID, err := strconv.ParseUint(projectIDStr, 10, 64)
 	if err != nil {
-		http.Error(w,
-			http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
@@ -103,14 +102,48 @@ func (s *FrontServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 		Name:      r.Form.Get("name"),
 		ProjectId: projectID,
 	}); err != nil {
-		http.Error(w,
-			http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	redirectURL := "/"
 	if strings.Contains(r.Referer(), "/project/") {
 		redirectURL = path.Join("/project", projectIDStr)
+	}
+
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+func (s *FrontServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
+	taskID, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	r.ParseForm()
+	status, err := strconv.ParseUint(r.Form.Get("status_id"), 10, 32)
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	task, err := s.TaskClient.UpdateTask(r.Context(), &pbtask.UpdateTaskRequest{
+		TaskId: taskID,
+		Name:   r.Form.Get("name"),
+		Status: pbtask.Status(status),
+	})
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	redirectURL := "/"
+	if strings.Contains(r.Referer(), "/project/") {
+		redirectURL = path.Join("/project", fmt.Sprint(task.Task.GetProjectId()))
 	}
 
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
