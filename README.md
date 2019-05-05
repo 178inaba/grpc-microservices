@@ -13,7 +13,7 @@ $ protoc -I=proto --go_out=plugins=grpc,paths=source_relative:./proto proto/task
 
 ## Environment switching
 
-Use `GRPC_MICROSERVICES_ENVIRONMENT`.
+Use `GRPC_MICROSERVICES_ENVIRONMENT`.  
 Everything except **production** is development.
 
 ```console
