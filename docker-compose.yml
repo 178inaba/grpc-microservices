@@ -10,7 +10,6 @@ services:
       - "50051:50051"
     environment:
       - "PROJECT_SERVICE_ADDR=project:50051"
-      - "ACTIVITY_SERVICE_ADDR=activity:50051"
   project:
     build:
       context: ./
