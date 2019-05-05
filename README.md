@@ -1,4 +1,4 @@
-# grpc-microservices
+# gRPC Microservices
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/178inaba/grpc-microservices)](https://goreportcard.com/report/github.com/178inaba/grpc-microservices)
 
