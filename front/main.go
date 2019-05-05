@@ -67,7 +67,6 @@ func main() {
 
 	// Mapping of endpoints and methods.
 	// (Add middleware for certification check to endpoints that require certification.)
-	// TODO Implements method.
 	r.Path("/").Methods(http.MethodGet).HandlerFunc(auth(frontSrv.ViewHome))
 	r.Path("/logout").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.Logout))
 	r.Path("/project").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.CreateProject))
