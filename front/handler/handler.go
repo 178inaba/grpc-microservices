@@ -55,6 +55,25 @@ func (s *FrontServer) ViewLogin(w http.ResponseWriter, r *http.Request) {
 	template.Render(w, "login.html", nil)
 }
 
+func (s *FrontServer) Login(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	user, err := s.UserClient.VerifyUser(r.Context(), &pbuser.VerifyUserRequest{
+		Email:    r.Form.Get("email"),
+		Password: []byte(r.Form.Get("password")),
+	})
+	if err != nil {
+		// TODO Redirect login page?
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	sessionID := session.ID()
+	s.SessionStore.Set(sessionID, user.User.GetId())
+	session.SetSessionIDToResponse(w, sessionID)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func (s *FrontServer) Logout(w http.ResponseWriter, r *http.Request) {
 	sessionID := session.GetSessionIDFromRequest(r)
 	s.SessionStore.Delete(sessionID)

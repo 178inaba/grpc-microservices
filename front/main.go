@@ -78,7 +78,7 @@ func main() {
 	r.Path("/signup").Methods(http.MethodGet).HandlerFunc(frontSrv.ViewSignup)
 	r.Path("/signup").Methods(http.MethodPost).HandlerFunc(frontSrv.Signup)
 	r.Path("/login").Methods(http.MethodGet).HandlerFunc(frontSrv.ViewLogin)
-	//r.Path("/login").Methods(http.MethodPost).HandlerFunc(frontSrv.Login)
+	r.Path("/login").Methods(http.MethodPost).HandlerFunc(frontSrv.Login)
 
 	static := http.StripPrefix("/static", http.FileServer(http.Dir("static")))
 	r.PathPrefix("/static/").Handler(static)
