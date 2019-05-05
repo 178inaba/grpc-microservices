@@ -32,12 +32,12 @@ func main() {
 	// Client stub generation.
 	activityConn, err := grpc.DialContext(ctx, os.Getenv("ACTIVITY_SERVICE_ADDR"), grpc.WithInsecure())
 	if err != nil {
-		logger.Fatal("Failed to dial activity", zap.Error(err))
+		logger.Fatal("Failed to dial activity.", zap.Error(err))
 	}
 
 	projectConn, err := grpc.DialContext(ctx, os.Getenv("PROJECT_SERVICE_ADDR"), grpc.WithInsecure())
 	if err != nil {
-		logger.Fatal("Failed to dial project", zap.Error(err))
+		logger.Fatal("Failed to dial project.", zap.Error(err))
 	}
 
 	// Add Interceptor.
