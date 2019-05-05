@@ -29,6 +29,10 @@ type FrontServer struct {
 	SessionStore   session.Store
 }
 
+func (s FrontServer) ViewSignup(w http.ResponseWriter, r *http.Request) {
+	template.Render(w, "signup.html", nil)
+}
+
 func (s *FrontServer) Signup(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	resp, err := s.UserClient.CreateUser(r.Context(), &pbuser.CreateUserRequest{

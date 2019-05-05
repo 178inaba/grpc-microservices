@@ -75,7 +75,7 @@ func main() {
 	r.Path("/project/{id}").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.UpdateProject))
 	r.Path("/task").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.CreateTask))
 	r.Path("/task/{id}").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.UpdateTask))
-	//r.Path("/signup").Methods(http.MethodGet).HandlerFunc(frontSrv.ViewSignup)
+	r.Path("/signup").Methods(http.MethodGet).HandlerFunc(frontSrv.ViewSignup)
 	r.Path("/signup").Methods(http.MethodPost).HandlerFunc(frontSrv.Signup)
 	//r.Path("/login").Methods(http.MethodGet).HandlerFunc(frontSrv.ViewLogin)
 	//r.Path("/login").Methods(http.MethodPost).HandlerFunc(frontSrv.Login)
