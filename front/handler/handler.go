@@ -58,6 +58,49 @@ func (s *FrontServer) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
+func (s *FrontServer) ViewProject(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	projectID, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	project, err := s.ProjectClient.FindProject(ctx, &pbproject.FindProjectRequest{
+		ProjectId: projectID,
+	})
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	tasks, err := s.TaskClient.FindProjectTasks(ctx, &pbtask.FindProjectTasksRequest{
+		ProjectId: projectID,
+	})
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	var taskRows []*TaskRow
+	for _, task := range tasks.GetTasks() {
+		taskRows = append(taskRows, &TaskRow{task, project.GetProject()})
+	}
+
+	user := support.GetUserFromContext(ctx)
+	template.Render(w, "project.html", &ProjectContent{
+		PageName:     "Project",
+		IsLoggedIn:   true,
+		UserEmail:    user.GetEmail(),
+		TaskStatuses: taskStatuses,
+		Project:      project.GetProject(),
+		TaskRows:     taskRows,
+	})
+}
+
 func (s *FrontServer) CreateProject(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if _, err := s.ProjectClient.CreateProject(r.Context(), &pbproject.CreateProjectRequest{
@@ -207,49 +250,6 @@ func (s *FrontServer) ViewHome(w http.ResponseWriter, r *http.Request) {
 			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-}
-
-func (s *FrontServer) ViewProject(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	projectID, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
-	if err != nil {
-		// TODO Error logging.
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	project, err := s.ProjectClient.FindProject(ctx, &pbproject.FindProjectRequest{
-		ProjectId: projectID,
-	})
-	if err != nil {
-		// TODO Error logging.
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	tasks, err := s.TaskClient.FindProjectTasks(ctx, &pbtask.FindProjectTasksRequest{
-		ProjectId: projectID,
-	})
-	if err != nil {
-		// TODO Error logging.
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	var taskRows []*TaskRow
-	for _, task := range tasks.GetTasks() {
-		taskRows = append(taskRows, &TaskRow{task, project.GetProject()})
-	}
-
-	user := support.GetUserFromContext(ctx)
-	template.Render(w, "project.html", &ProjectContent{
-		PageName:     "Project",
-		IsLoggedIn:   true,
-		UserEmail:    user.GetEmail(),
-		TaskStatuses: taskStatuses,
-		Project:      project.GetProject(),
-		TaskRows:     taskRows,
-	})
 }
 
 type HomeContent struct {
