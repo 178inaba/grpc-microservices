@@ -73,6 +73,7 @@ func NewAuthentication(userClient pbuser.UserServiceClient, sessionStore session
 			ctx := r.Context()
 			resp, err := userClient.FindUser(ctx, &pbuser.FindUserRequest{UserId: userID})
 			if err != nil {
+				// TODO Error logging.
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
