@@ -9,7 +9,8 @@ services:
     ports:
       - "50051:50051"
     environment:
-      - "PROJECT_SERVICE_ADDR=project:50051"
+      PROJECT_SERVICE_ADDR: project:50051
+      GRPC_MICROSERVICES_ENVIRONMENT:
   project:
     build:
       context: ./
@@ -19,8 +20,9 @@ services:
     ports:
       - "50052:50051"
     environment:
-      - "USER_SERVICE_ADDR=user:50051"
-      - "ACTIVITY_SERVICE_ADDR=activity:50051"
+      USER_SERVICE_ADDR: user:50051
+      ACTIVITY_SERVICE_ADDR: activity:50051
+      GRPC_MICROSERVICES_ENVIRONMENT:
   task:
     build:
       context: ./
@@ -30,8 +32,9 @@ services:
     ports:
       - "50053:50051"
     environment:
-      - "PROJECT_SERVICE_ADDR=project:50051"
-      - "ACTIVITY_SERVICE_ADDR=activity:50051"
+      PROJECT_SERVICE_ADDR: project:50051
+      ACTIVITY_SERVICE_ADDR: activity:50051
+      GRPC_MICROSERVICES_ENVIRONMENT:
   activity:
     build:
       context: ./
@@ -41,7 +44,8 @@ services:
     ports:
       - "50054:50051"
     environment:
-      - "USER_SERVICE_ADDR=user:50051"
+      USER_SERVICE_ADDR: user:50051
+      GRPC_MICROSERVICES_ENVIRONMENT:
   front:
     build:
       context: ./
@@ -51,7 +55,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - "USER_SERVICE_ADDR=user:50051"
-      - "PROJECT_SERVICE_ADDR=project:50051"
-      - "TASK_SERVICE_ADDR=task:50051"
-      - "ACTIVITY_SERVICE_ADDR=activity:50051"
+      USER_SERVICE_ADDR: user:50051
+      PROJECT_SERVICE_ADDR: project:50051
+      TASK_SERVICE_ADDR: task:50051
+      ACTIVITY_SERVICE_ADDR: activity:50051
+      GRPC_MICROSERVICES_ENVIRONMENT:

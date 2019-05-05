@@ -20,12 +20,20 @@ import (
 const port = 50051
 
 func main() {
-	// TODO See environment variable.
-	logger, err := zap.NewDevelopment()
-	defer logger.Sync()
-	if err != nil {
-		panic(fmt.Sprintf("zap new: %v.", err))
+	var logger *zap.Logger
+	var err error
+	environment := os.Getenv("GRPC_MICROSERVICES_ENVIRONMENT")
+	if environment == "production" {
+		logger, err = zap.NewProduction()
+	} else {
+		logger, err = zap.NewDevelopment()
 	}
+	if err != nil {
+		panic(fmt.Sprintf("zap new: %v, environment: %s.", err, environment))
+	}
+	defer logger.Sync()
+
+	logger.Info("Start user service.", zap.String("environment", environment))
 
 	ctx := context.Background()
 
