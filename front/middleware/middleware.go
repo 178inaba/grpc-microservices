@@ -60,20 +60,20 @@ func NewAuthentication(userClient pbuser.UserServiceClient, sessionStore session
 			sessionID := session.GetSessionIDFromRequest(r)
 			v, ok := sessionStore.Get(sessionID)
 			if !ok {
-				http.Redirect(w, r, "/login", http.StatusFound)
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
 
 			userID, ok := v.(uint64)
 			if !ok {
-				http.Redirect(w, r, "/login", http.StatusFound)
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
 
 			ctx := r.Context()
 			resp, err := userClient.FindUser(ctx, &pbuser.FindUserRequest{UserId: userID})
 			if err != nil {
-				http.Redirect(w, r, "/login", http.StatusFound)
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
 

@@ -69,7 +69,7 @@ func main() {
 	// (Add middleware for certification check to endpoints that require certification.)
 	// TODO Implements method.
 	r.Path("/").Methods(http.MethodGet).HandlerFunc(auth(frontSrv.ViewHome))
-	//r.Path("/logout").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.Logout))
+	r.Path("/logout").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.Logout))
 	//r.Path("/project").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.CreateProject))
 	//r.Path("/project/{id}").Methods(http.MethodGet).HandlerFunc(auth(frontSrv.ViewProject))
 	//r.Path("/project/{id}").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.UpdateProject))

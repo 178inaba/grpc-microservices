@@ -43,7 +43,14 @@ func (s *FrontServer) Signup(w http.ResponseWriter, r *http.Request) {
 	sessionID := session.ID()
 	s.SessionStore.Set(sessionID, resp.GetUser().GetId())
 	session.SetSessionIDToResponse(w, sessionID)
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (s *FrontServer) Logout(w http.ResponseWriter, r *http.Request) {
+	sessionID := session.GetSessionIDFromRequest(r)
+	s.SessionStore.Delete(sessionID)
+	session.DeleteSessionIDFromResponse(w)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func (s *FrontServer) CreateTask(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +77,7 @@ func (s *FrontServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 		redirectURL = path.Join("/project", projectIDStr)
 	}
 
-	http.Redirect(w, r, redirectURL, http.StatusFound)
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
 
 func (s *FrontServer) ViewHome(w http.ResponseWriter, r *http.Request) {
