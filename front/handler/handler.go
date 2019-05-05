@@ -51,6 +51,10 @@ func (s *FrontServer) Signup(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func (s *FrontServer) ViewLogin(w http.ResponseWriter, r *http.Request) {
+	template.Render(w, "login.html", nil)
+}
+
 func (s *FrontServer) Logout(w http.ResponseWriter, r *http.Request) {
 	sessionID := session.GetSessionIDFromRequest(r)
 	s.SessionStore.Delete(sessionID)
