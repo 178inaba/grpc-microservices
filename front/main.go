@@ -72,7 +72,7 @@ func main() {
 	r.Path("/logout").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.Logout))
 	r.Path("/project").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.CreateProject))
 	r.Path("/project/{id}").Methods(http.MethodGet).HandlerFunc(auth(frontSrv.ViewProject))
-	//r.Path("/project/{id}").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.UpdateProject))
+	r.Path("/project/{id}").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.UpdateProject))
 	r.Path("/task").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.CreateTask))
 	//r.Path("/task/{id}").Methods(http.MethodPost).HandlerFunc(auth(frontSrv.UpdateTask))
 	//r.Path("/signup").Methods(http.MethodGet).HandlerFunc(frontSrv.ViewSignup)

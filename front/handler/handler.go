@@ -60,12 +60,33 @@ func (s *FrontServer) CreateProject(w http.ResponseWriter, r *http.Request) {
 		Name: r.Form.Get("name"),
 	}); err != nil {
 		// TODO Error logging.
-		http.Error(w,
-			http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (s *FrontServer) UpdateProject(w http.ResponseWriter, r *http.Request) {
+	projectIDStr := mux.Vars(r)["id"]
+	projectID, err := strconv.ParseUint(projectIDStr, 10, 64)
+	if err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	r.ParseForm()
+	if _, err := s.ProjectClient.UpdateProject(r.Context(), &pbproject.UpdateProjectRequest{
+		ProjectId:   projectID,
+		ProjectName: r.Form.Get("name"),
+	}); err != nil {
+		// TODO Error logging.
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, path.Join("/project", projectIDStr), http.StatusSeeOther)
 }
 
 func (s *FrontServer) CreateTask(w http.ResponseWriter, r *http.Request) {
@@ -190,7 +211,7 @@ func (s *FrontServer) ViewProject(w http.ResponseWriter, r *http.Request) {
 		UserEmail:    user.GetEmail(),
 		TaskStatuses: taskStatuses,
 		Project:      project.GetProject(),
-		TaskRows:     ttaskRows,
+		TaskRows:     taskRows,
 	})
 }
 
