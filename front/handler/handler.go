@@ -58,6 +58,62 @@ func (s *FrontServer) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
+func (s *FrontServer) ViewHome(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var in empty.Empty
+	activities, err := s.ActivityClient.FindActivities(ctx, &in)
+	if err != nil {
+		http.Error(w,
+			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	projects, err := s.ProjectClient.FindProjects(ctx, &in)
+	if err != nil {
+		http.Error(w,
+			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	tasks, err := s.TaskClient.FindTasks(ctx, &in)
+	if err != nil {
+		http.Error(w,
+			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	var activityRows []*ActivityRow
+	for _, activity := range activities.GetActivities() {
+		activityRows = append(activityRows, &ActivityRow{activity})
+	}
+
+	idToPj := make(map[uint64]*pbproject.Project)
+	for _, project := range projects.GetProjects() {
+		idToPj[project.GetId()] = project
+	}
+
+	var taskRows []*TaskRow
+	for _, task := range tasks.GetTasks() {
+		project := idToPj[task.GetProjectId()]
+		taskRows = append(taskRows, &TaskRow{task, project})
+	}
+
+	user := support.GetUserFromContext(ctx)
+	if err := template.Render(w, "home.html", &HomeContent{
+		PageName:     "Home",
+		IsLoggedIn:   true,
+		UserEmail:    user.Email,
+		TaskStatuses: taskStatuses,
+		ActivityRows: activityRows,
+		Projects:     projects.GetProjects(),
+		TaskRows:     taskRows,
+	}); err != nil {
+		http.Error(w,
+			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (s *FrontServer) ViewProject(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectID, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
@@ -194,62 +250,6 @@ func (s *FrontServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
-}
-
-func (s *FrontServer) ViewHome(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	var in empty.Empty
-	activities, err := s.ActivityClient.FindActivities(ctx, &in)
-	if err != nil {
-		http.Error(w,
-			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	projects, err := s.ProjectClient.FindProjects(ctx, &in)
-	if err != nil {
-		http.Error(w,
-			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	tasks, err := s.TaskClient.FindTasks(ctx, &in)
-	if err != nil {
-		http.Error(w,
-			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	var activityRows []*ActivityRow
-	for _, activity := range activities.GetActivities() {
-		activityRows = append(activityRows, &ActivityRow{activity})
-	}
-
-	idToPj := make(map[uint64]*pbproject.Project)
-	for _, project := range projects.GetProjects() {
-		idToPj[project.GetId()] = project
-	}
-
-	var taskRows []*TaskRow
-	for _, task := range tasks.GetTasks() {
-		project := idToPj[task.GetProjectId()]
-		taskRows = append(taskRows, &TaskRow{task, project})
-	}
-
-	user := support.GetUserFromContext(ctx)
-	if err := template.Render(w, "home.html", &HomeContent{
-		PageName:     "Home",
-		IsLoggedIn:   true,
-		UserEmail:    user.Email,
-		TaskStatuses: taskStatuses,
-		ActivityRows: activityRows,
-		Projects:     projects.GetProjects(),
-		TaskRows:     taskRows,
-	}); err != nil {
-		http.Error(w,
-			http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
 }
 
 type HomeContent struct {
