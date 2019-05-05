@@ -53,6 +53,20 @@ func (s *FrontServer) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
+func (s *FrontServer) CreateProject(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	if _, err := s.ProjectClient.CreateProject(r.Context(), &pbproject.CreateProjectRequest{
+		Name: r.Form.Get("name"),
+	}); err != nil {
+		// TODO Error logging.
+		http.Error(w,
+			http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func (s *FrontServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	projectIDStr := r.Form.Get("project_id")
