@@ -33,7 +33,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	logger.Info("Start user service.", zap.String("environment", environment))
+	logger.Info("Start project service.", zap.String("environment", environment))
 
 	ctx := context.Background()
 
