@@ -14,5 +14,7 @@ FROM alpine:3.9 as runner
 
 ENV TZ Asia/Tokyo
 COPY --from=builder /app/front-service .
+COPY front/static /static
+COPY front/template /template
 
 CMD ["./front-service"]
