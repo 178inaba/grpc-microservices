@@ -30,7 +30,7 @@ type FrontServer struct {
 }
 
 func (s FrontServer) ViewSignup(w http.ResponseWriter, r *http.Request) {
-	template.Render(w, "signup.html", nil)
+	template.Render(w, "signup.tmpl", nil)
 }
 
 func (s *FrontServer) Signup(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +52,7 @@ func (s *FrontServer) Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FrontServer) ViewLogin(w http.ResponseWriter, r *http.Request) {
-	template.Render(w, "login.html", nil)
+	template.Render(w, "login.tmpl", nil)
 }
 
 func (s *FrontServer) Login(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +122,7 @@ func (s *FrontServer) ViewHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := support.GetUserFromContext(ctx)
-	if err := template.Render(w, "home.html", &HomeContent{
+	if err := template.Render(w, "home.tmpl", &HomeContent{
 		PageName:     "Home",
 		IsLoggedIn:   true,
 		UserEmail:    user.Email,
@@ -170,7 +170,7 @@ func (s *FrontServer) ViewProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := support.GetUserFromContext(ctx)
-	template.Render(w, "project.html", &ProjectContent{
+	template.Render(w, "project.tmpl", &ProjectContent{
 		PageName:     "Project",
 		IsLoggedIn:   true,
 		UserEmail:    user.GetEmail(),
