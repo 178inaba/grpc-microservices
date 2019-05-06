@@ -31,7 +31,7 @@ func (s *storeOnMemory) createActivity(activity *pb.Activity) (*pb.Activity, err
 	newActivity := *activity
 	idx := s.activities.Index()
 	newActivity.Id = idx
-	s.activities.Set(idx, newActivity)
+	s.activities.Set(idx, &newActivity)
 
 	return &newActivity, nil
 }
