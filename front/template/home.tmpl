@@ -14,9 +14,9 @@
       <li class="task-list-item js_edit-task-trigger" tabindex="0">
         <input class="task-list-item__task_id" type="hidden" value="{{.ID}}">
         <input class="task-list-item__task_status" type="hidden" value="{{.Status}}">
-        <span class="task-list-item__project-name">{{.ProjectName}}"</span>
-        <span class="task-list-item__task-name">{{.Name}}"</span>
-        <span class="task-list-item__status"><span class="pill -type-{{.Status}}">{{.StatusName}}"</span></span>
+        <span class="task-list-item__project-name">{{.ProjectName}}</span>
+        <span class="task-list-item__task-name">{{.Name}}</span>
+        <span class="task-list-item__status"><span class="pill -type-{{.Status}}">{{.StatusName}}</span></span>
       </li>
     {{end}}
     </ul>
@@ -61,7 +61,7 @@
         <label for="add-task-project">Project</label><br>
         <span class="selectbox-wrapper">
           <select id="add-task-project" class="selectbox" name="project_id">
-          {{range .Project}}
+          {{range .Projects}}
             <option value="{{.Id}}">{{.Name}}</option>
           {{end}}
           </select>
@@ -175,7 +175,7 @@
     const addProjectModal = $("#addProjectModal");
     addProjectModalTrigger.on("click", function () {
       const expanded = addProjectModalTrigger.attr("aria-expanded") === "true";
-      addTaskModal.attr("aria-hidden", expanded);
+      addProjectModal.attr("aria-hidden", expanded);
       addProjectModalTrigger.attr("aria-expanded", !expanded);
       appMain.attr({"tabindex": "-1", "aria-hidden": !expanded});
       if (!expanded) {
