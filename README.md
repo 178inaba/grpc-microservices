@@ -19,3 +19,11 @@ Everything except **production** is development.
 ```console
 $ GRPC_MICROSERVICES_ENVIRONMENT=production docker-compose up
 ```
+
+## License
+
+[MIT](LICENSE)
+
+## Author
+
+[178inaba](https://github.com/178inaba)
